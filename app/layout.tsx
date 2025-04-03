@@ -4,6 +4,8 @@ import { Inter } from 'next/font/google'
 import NavBar from './NavBar'
 import { Theme } from '@radix-ui/themes'
 
+import "@radix-ui/themes/styles.css";
+
 
 const inter = Inter({ subsets: ['latin'] })
 
