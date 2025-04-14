@@ -10,6 +10,7 @@ import axios from 'axios'
 import React, { useState } from 'react'
 import SimpleMDE from "react-simplemde-editor"
 import "easymde/dist/easymde.min.css"
+import ErrorMessage from '@/app/components/ErrorMessage'
 
 type IssueForm = z.infer<typeof createIssueSchema>
 
@@ -37,13 +38,13 @@ const NewIssuePage = () => {
             }
           })}>
           <TextField.Root placeholder='Title' {...register('title')}/>
-          {errors.title && <Text color='red' as ='p'>{errors.title.message}</Text>}
+          <ErrorMessage>{errors.title?.message}</ErrorMessage>
           <Controller 
               name='description'
               control={control}
               render={({field}) => <SimpleMDE placeholder='Description' {...field} /> }
           />
-          {errors.description && <Text color='red' as='p'>{errors.description.message}</Text>}
+          <ErrorMessage>{errors.description?.message}</ErrorMessage>
           <Button variant='soft'>Submit New Issue</Button>
       </form>
     </div>
