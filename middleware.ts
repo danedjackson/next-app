@@ -3,26 +3,28 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
     const response = NextResponse.next();
-    console.log(process.env.ENVIRONMENT === 'production')
-    if(process.env.ENVIRONMENT ==='production') {
-        const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
-        const cspHeader = `
-        default-src 'self';
-        script-src 'self' 'nonce-${nonce}' 'strict-dynamic';
-        style-src 'self' 'nonce-${nonce}';
-        img-src 'self' blob: data:;
-        font-src 'self';
-        object-src 'none';
-        base-uri 'self';
-        form-action 'self';
-        frame-ancestors 'none';
-        upgrade-insecure-requests;
-        `
-        //Replace newline characters and spaces
-        const contentSecurityPolicyHeaderValue = cspHeader.replace(/\s{2,}/g, ' ').trim();
 
-        response.headers.set('x-nonce', nonce);
+    const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
+    const cspHeader = `
+    default-src 'self';
+    script-src 'self' 'nonce-${nonce}' 'strict-dynamic';
+    style-src 'self' 'nonce-${nonce}';
+    img-src 'self' blob: data:;
+    font-src 'self';
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    frame-ancestors 'none';
+    upgrade-insecure-requests;
+    `
+    //Replace newline characters and spaces
+    const contentSecurityPolicyHeaderValue = cspHeader.replace(/\s{2,}/g, ' ').trim();
+
+    response.headers.set('x-nonce', nonce);
+    if(process.env.ENVIRONMENT === 'production') {
         response.headers.set('Content-Security-Policy', contentSecurityPolicyHeaderValue);
+    } else {
+        response.headers.set('Content-Security-Policy-Report-Only', contentSecurityPolicyHeaderValue);
     }
     response.headers.set('X-Content-Type-Options', 'no-sniff');
     response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
