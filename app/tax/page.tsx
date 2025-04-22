@@ -1,11 +1,12 @@
 import { Button } from '@radix-ui/themes'
 import React from 'react'
+import FileUpload from '../components/FileUpload'
 
 const Tax = () => {
   return (
-    <>
-        <Button>Upload Document</Button>
-    </>
+    <div className='max-w-xl space-y-3'>
+      <FileUpload />
+    </div>
   )
 }
 
