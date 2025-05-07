@@ -7,7 +7,7 @@ export function middleware(request: NextRequest) {
     const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
     const cspHeader = `
     default-src 'self';
-    script-src 'self' 'nonce-${nonce}' 'strict-dynamic';
+    script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-eval';
     style-src 'self' 'nonce-${nonce}';
     img-src 'self' blob: data:;
     font-src 'self';
@@ -22,6 +22,7 @@ export function middleware(request: NextRequest) {
 
     response.headers.set('x-nonce', nonce);
     if(process.env.ENVIRONMENT === 'production') {
+        cspHeader.replace(`script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-eval';`, `script-src 'self' 'nonce-${nonce}' 'strict-dynamic';`);
         response.headers.set('Content-Security-Policy', contentSecurityPolicyHeaderValue);
     } else {
         response.headers.set('Content-Security-Policy-Report-Only', contentSecurityPolicyHeaderValue);
@@ -45,7 +46,7 @@ export const config = {
        * - favicon.ico (favicon file)
        */
       {
-        source: '/((?!api|_next/static|_next/image|favicon.ico).*)',
+        source: '/((?!_next/static|_next/image|favicon.ico).*)',
         missing: [
           { type: 'header', key: 'next-router-prefetch' },
           { type: 'header', key: 'purpose', value: 'prefetch' },

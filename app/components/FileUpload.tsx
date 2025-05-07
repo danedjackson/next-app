@@ -1,13 +1,30 @@
 'use client'
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import axios from 'axios'
 import { Button } from '@radix-ui/themes'
 import ErrorMessage from './ErrorMessage'
+import { headers } from 'next/headers'
 
 const FileUpload = () => {
   const [file, setFile] = useState<File | null>(null)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [error, setError] = useState<string>('')
+  const [nonce, setNonce] = useState<string | null>(null)
+
+  // Fetch nonce when the component mounts
+  useEffect(() => {
+    const fetchNonce = async () => {
+        try {
+            const response = await axios.get('/api/nonce');
+            setNonce(response.data.nonce); // Retrieve nonce from API response
+        } catch (error) {
+            console.error('Error fetching nonce:', error);
+        }
+    };
+
+    fetchNonce();
+  }, []);
+
   
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if(event.target.files) {
@@ -26,7 +43,8 @@ const FileUpload = () => {
     try {
         const response = await axios.post('api/upload', formData, {
             headers: {
-                'Content-Type': 'multipart/form-data'
+                'Content-Type': 'multipart/form-data',
+                'X-Nonce': nonce // Necessary to conform to CSP
             },
             onUploadProgress: progressEvent => {
                 const percentageCompleted = Math.round(
